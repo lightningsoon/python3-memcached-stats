@@ -1,4 +1,7 @@
-import re, telnetlib, sys
+import re
+import telnetlib
+import sys
+
 
 class MemcachedStats:
 
@@ -7,28 +10,27 @@ class MemcachedStats:
     _slab_regex = re.compile(r'STAT items:(.*):number')
     _stat_regex = re.compile(r"STAT (.*) (.*)\r")
 
-    def __init__(self, host='localhost', port='11211', timeout=None):
+    def __init__(self, host='localhost', port='11211'):
         self._host = host
         self._port = port
-        self._timeout = timeout
 
     @property
     def client(self):
         if self._client is None:
-            self._client = telnetlib.Telnet(self._host, self._port,
-                                            self._timeout)
+            self._client = telnetlib.Telnet(self._host, self._port)
         return self._client
 
     def command(self, cmd):
         ' Write a command to telnet and return the response '
-        self.client.write(("%s\n" % cmd).encode('ascii'))
-        return self.client.read_until(b'END').decode('ascii')
+        self.client.write(bytes("%s\n" % cmd, 'utf8'))
+        tmp = str(self.client.read_until(b'END'), 'utf8')
+        return tmp
 
     def key_details(self, sort=True, limit=100):
         ' Return a list of tuples containing keys and details '
         cmd = 'stats cachedump %s %s'
         keys = [key for id in self.slab_ids()
-            for key in self._key_regex.findall(self.command(cmd % (id, limit)))]
+                for key in self._key_regex.findall(self.command(cmd % (id, limit)))]
         if sort:
             return sorted(keys)
         else:
@@ -46,6 +48,7 @@ class MemcachedStats:
         ' Return a dict containing memcached stats '
         return dict(self._stat_regex.findall(self.command('stats')))
 
+
 def main(argv=None):
     if not argv:
         argv = sys.argv
@@ -54,6 +57,7 @@ def main(argv=None):
     import pprint
     m = MemcachedStats(host, port)
     pprint.pprint(m.keys())
+
 
 if __name__ == '__main__':
     main()
