@@ -1,4 +1,4 @@
-# python-memcached-stats
+# python3-memcached-stats
 
 Python class to gather stats and slab keys from memcached via the memcached telnet interface
 
@@ -39,7 +39,7 @@ ip defaults to 127.0.0.1 and port defaults to 11211.
 
 ## Installation
 
-    pip install 'git+git://github.com/dlrust/python-memcached-stats.git'
+    pip install 'git+git://github.com/lightningsoon/python3-memcached-stats'
 
 ## License
 
